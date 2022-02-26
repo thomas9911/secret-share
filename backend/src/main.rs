@@ -1,6 +1,7 @@
 use warp::filters::BoxedFilter;
 use warp::reject::Rejection;
 use warp::Filter;
+use rust_embed::RustEmbed;
 
 use redis::aio::ConnectionManager;
 
@@ -11,6 +12,10 @@ use crypto_part::{Key, random_bytes};
 mod errors;
 use errors::{InvalidBase64, NotFound, handle_rejection};
 
+#[derive(RustEmbed)]
+#[folder = "../frontend/dist"]
+struct Data;
+
 #[tokio::main]
 async fn main() {
     pretty_env_logger::init();
@@ -18,10 +23,10 @@ async fn main() {
     let conn = client.get_tokio_connection_manager().await.unwrap();
 
     let api = getter(conn.clone()).or(setter(conn));
-    let static_files = warp::fs::dir("../frontend/dist");
+    let data_serve = warp_embed::embed(&Data);
 
     let endpoints = api
-        .or(static_files)
+        .or(data_serve)
         .recover(handle_rejection)
         .with(warp::trace::request());
 
@@ -65,7 +70,6 @@ async fn redis_set(
     path: String,
     secret: String,
 ) -> Result<String, Rejection> {
-    println!("{}", secret);
     let out: String = redis::Cmd::set_ex(&path, secret, 60 * 60 * 24)
         .query_async(&mut con_manager)
         .await

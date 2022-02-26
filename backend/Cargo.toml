@@ -13,3 +13,5 @@ tracing = "0.1"
 redis = {version= "*", features=["tokio-comp", "connection-manager"]}
 crypto_part = {path = "../crypto_part"}
 base64 = "0.13"
+rust-embed = "6.3"
+warp-embed = "0.4"
