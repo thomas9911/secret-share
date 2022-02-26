@@ -1,0 +1,7 @@
+[workspace]
+
+members = [
+    "frontend",
+    "backend",
+    "crypto_part",
+]

@@ -1,0 +1,36 @@
+[package]
+edition = "2021"
+name = "frontend-trunk"
+version = "0.1.0"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+base64 = "0.13.0"
+console_error_panic_hook = "0.1"
+crypto_part = {path = "../crypto_part"}
+js-sys = "0.3"
+wasm-bindgen = "0.2.79"
+web-sys = {version = "0.3", features = [
+  "Window",
+  "Location",
+  "Document",
+  "HtmlElement",
+  "Node",
+  "Text",
+  "HtmlTextAreaElement",
+  "HtmlInputElement",
+  "HtmlButtonElement",
+  "NodeList",
+  'Headers',
+  'Request',
+  'RequestInit',
+  'RequestMode',
+  'Response',
+  "HtmlAnchorElement",
+  # "Crypto",
+  # "SubtleCrypto",
+  # "UrlSearchParams"
+]}
+wee_alloc = "0.4"
+wasm-bindgen-futures = "0.4"

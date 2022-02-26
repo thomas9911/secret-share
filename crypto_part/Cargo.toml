@@ -1,0 +1,16 @@
+[package]
+name = "crypto_part"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+flate2 = "1.0"
+aes-gcm-siv = {version = "0.10", features=["std"]}
+sha2 = "0.10"
+derive_more = "0.99"
+pico-args = "0.4"
+
+[target.wasm32-unknown-unknown.dependencies]
+getrandom = {version = "*", features = ["js"] }
