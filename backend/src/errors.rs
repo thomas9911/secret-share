@@ -13,7 +13,6 @@ pub struct NotFound;
 
 impl warp::reject::Reject for NotFound {}
 
-
 pub async fn handle_rejection(err: Rejection) -> Result<impl Reply, std::convert::Infallible> {
     if err.is_not_found() {
         Ok(reply::with_status("NOT_FOUND", StatusCode::NOT_FOUND))

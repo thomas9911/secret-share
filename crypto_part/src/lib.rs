@@ -1,17 +1,15 @@
 use aes_gcm_siv::aead::rand_core::{OsRng, RngCore};
 use aes_gcm_siv::aead::{Aead, NewAead};
 use aes_gcm_siv::{Aes256GcmSiv, Nonce};
-use sha2::Digest;
-
+use derive_more::{Display, From};
 use flate2::bufread::{GzDecoder, GzEncoder};
 use flate2::Compression;
+use sha2::digest::consts::U32;
+use sha2::digest::generic_array::GenericArray;
+use sha2::Digest;
 use std::io;
 use std::io::prelude::*;
 use std::io::BufReader;
-use sha2::digest::generic_array::GenericArray;
-use sha2::digest::consts::U32;
-
-use derive_more::{Display, From};
 
 type AeadKey = aes_gcm_siv::Key<<Aes256GcmSiv as NewAead>::KeySize>;
 

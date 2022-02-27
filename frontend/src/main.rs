@@ -11,10 +11,7 @@ use wasm_bindgen::prelude::*;
 use wasm_bindgen::JsCast;
 
 use web_sys::window;
-use web_sys::{
-    Document, Element, HtmlAnchorElement, HtmlButtonElement, HtmlElement, HtmlTextAreaElement,
-    Window,
-};
+use web_sys::{Document, Element, HtmlAnchorElement, HtmlButtonElement, HtmlTextAreaElement};
 
 mod http;
 pub use http::{APIRequest, FakeBackend, RealBackend};
@@ -261,5 +258,3 @@ fn main() -> Result<(), JsValue> {
 
     Ok(())
 }
-
-// use spawn_local function to do the fetching part

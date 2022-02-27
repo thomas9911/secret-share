@@ -2,4 +2,4 @@ cd frontend
 trunk clean
 trunk build --release
 cd ..
-cargo build --release --bin backend
+cargo build --release --bin secret-share

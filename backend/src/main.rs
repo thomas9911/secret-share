@@ -1,25 +1,45 @@
+use redis::aio::ConnectionManager;
+use rust_embed::RustEmbed;
+use std::net::IpAddr;
+use structopt::StructOpt;
 use warp::filters::BoxedFilter;
 use warp::reject::Rejection;
 use warp::Filter;
-use rust_embed::RustEmbed;
-
-use redis::aio::ConnectionManager;
 
 // use tracing::error;
 
-use crypto_part::{Key, random_bytes};
+use crypto_part::{random_bytes, Key};
 
 mod errors;
-use errors::{InvalidBase64, NotFound, handle_rejection};
+use errors::{handle_rejection, InvalidBase64, NotFound};
 
 #[derive(RustEmbed)]
 #[folder = "../frontend/dist"]
 struct Data;
 
+#[derive(Debug, StructOpt)]
+#[structopt(name = "example", about = "An example of StructOpt usage.")]
+struct Opt {
+    /// Activate debug mode
+    #[structopt(
+        short,
+        long,
+        env = "SECRET_SHARE_REDIS_URL",
+        default_value = "redis://localhost:6379"
+    )]
+    redis: redis::ConnectionInfo,
+    #[structopt(short, long, env = "SECRET_SHARE_ADDRESS", default_value = "::1")]
+    address: IpAddr,
+    #[structopt(short, long, env = "SECRET_SHARE_PORT", default_value = "3030")]
+    port: u16,
+}
+
 #[tokio::main]
 async fn main() {
+    let opt = Opt::from_args();
     pretty_env_logger::init();
-    let client = redis::Client::open("redis://localhost:6379").unwrap();
+
+    let client = redis::Client::open(opt.redis).unwrap();
     let conn = client.get_tokio_connection_manager().await.unwrap();
 
     let api = getter(conn.clone()).or(setter(conn));
@@ -30,7 +50,7 @@ async fn main() {
         .recover(handle_rejection)
         .with(warp::trace::request());
 
-    warp::serve(endpoints).run(([127, 0, 0, 1], 3030)).await;
+    warp::serve(endpoints).run((opt.address, opt.port)).await;
 }
 
 fn getter(con_manager: ConnectionManager) -> BoxedFilter<(String,)> {
@@ -56,7 +76,10 @@ fn setter(con_manager: ConnectionManager) -> BoxedFilter<(String,)> {
 async fn redis_get(mut con_manager: ConnectionManager, path: String) -> Result<String, Rejection> {
     let out: (String, usize) = redis::pipe()
         .atomic()
-        .getset(&path, base64::encode_config(random_bytes(), base64::URL_SAFE_NO_PAD))
+        .getset(
+            &path,
+            base64::encode_config(random_bytes(), base64::URL_SAFE_NO_PAD),
+        )
         .del(&path)
         .query_async(&mut con_manager)
         .await
